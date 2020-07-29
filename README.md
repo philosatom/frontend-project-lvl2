@@ -2,6 +2,9 @@ This repository is created for educational purposes.
 
 # frontend-project-lvl2
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/93a94c70e4c736216832/maintainability)](https://codeclimate.com/github/philosatom/frontend-project-lvl2/maintainability)
+![Node CI](https://github.com/philosatom/frontend-project-lvl2/workflows/Node%20CI/badge.svg)
+
 ## Setup
 ```sh
 $ make install
