@@ -1,0 +1,23 @@
+env:
+  es2020: true
+  node: true
+
+extends: 
+  - 'eslint:recommended'
+  - airbnb-base
+
+rules:
+  no-console: 0
+  import/extensions: 0
+  comma-dangle:
+    - error
+    - never
+  max-len:
+    - error
+    -
+      code: 100
+      ignoreComments: true
+      ignoreTrailingComments: true
+      ignoreStrings: true
+      ignoreTemplateLiterals: true
+      ignoreRegExpLiterals: true
