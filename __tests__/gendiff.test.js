@@ -1,8 +1,11 @@
 import path from 'path';
-import process from 'process';
+import { fileURLToPath } from 'url';
 import genDiff from '../src/gendiff.js';
 
-const getFixturePath = (filename) => path.join(process.cwd(), '__fixtures__', filename);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const getFixturePath = (filepath) => path.join(__dirname, '..', '__fixtures__', filepath);
 
 test('gendiff json', () => {
   const path1 = getFixturePath('before.json');
