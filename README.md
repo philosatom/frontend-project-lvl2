@@ -10,3 +10,6 @@ This repository is created for educational purposes.
 ```sh
 $ make install
 ```
+
+## Examples
+[![asciicast](https://asciinema.org/a/350585.svg)](https://asciinema.org/a/350585)

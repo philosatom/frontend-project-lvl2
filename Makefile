@@ -15,3 +15,5 @@ test-coverage:
 
 gendiff:
 	node --experimental-json-modules --no-warnings bin/gendiff.js
+
+.PHONY: test
