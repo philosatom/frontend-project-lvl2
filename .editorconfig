@@ -13,3 +13,6 @@ indent_style = tab
 
 [*.md]
 trim_trailing_whitespace = false
+
+[/__fixtures__/*.txt]
+insert_final_newline = false

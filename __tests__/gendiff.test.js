@@ -1,21 +1,15 @@
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
-import genDiff from '../src/gendiff.js';
+import genDiff from '../index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const getFixturePath = (filename, ext) => path.join(__dirname, '..', '__fixtures__', `${filename}.${ext}`);
-const expected = [
-  '{',
-  '  - follow: false',
-  '    host: hexlet.io',
-  '  - proxy: 123.234.53.22',
-  '  - timeout: 50',
-  '  + timeout: 20',
-  '  + verbose: true',
-  '}'
-].join('\n');
+
+const pathToExpected = getFixturePath('expected', 'txt');
+const expected = fs.readFileSync(pathToExpected, 'utf-8');
 
 test.each([
   ['json'],
