@@ -5,7 +5,7 @@ import genDiff from '../src/gendiff.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const getFixturePath = (filepath) => path.join(__dirname, '..', '__fixtures__', filepath);
+const getFixturePath = (filename, ext) => path.join(__dirname, '..', '__fixtures__', `${filename}.${ext}`);
 const expected = [
   '{',
   '  - follow: false',
@@ -17,18 +17,13 @@ const expected = [
   '}'
 ].join('\n');
 
-test('gendiff json', () => {
-  const path1 = getFixturePath('before.json');
-  const path2 = getFixturePath('after.json');
-
-  const actual = genDiff(path1, path2);
-
-  expect(actual).toBe(expected);
-});
-
-test('gendiff yml', () => {
-  const path1 = getFixturePath('before.yml');
-  const path2 = getFixturePath('after.yml');
+test.each([
+  ['json'],
+  ['yml'],
+  ['ini']
+])('gendiff %s', (ext) => {
+  const path1 = getFixturePath('before', ext);
+  const path2 = getFixturePath('after', ext);
 
   const actual = genDiff(path1, path2);
 
