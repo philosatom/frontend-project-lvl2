@@ -2,6 +2,7 @@ import path from 'path';
 import process from 'process';
 import fs from 'fs';
 import _ from 'lodash';
+import parsersByFormat from './parsers.js';
 
 const getFileContent = (filepath) => {
   const fullpath = path.resolve(process.cwd(), filepath);
@@ -52,10 +53,13 @@ const getFormattedDiff = (diff) => {
 };
 
 export default (path1, path2) => {
+  const format = path.extname(path1);
+  const parse = parsersByFormat[format];
+
   const content1 = getFileContent(path1);
   const content2 = getFileContent(path2);
-  const parsed1 = JSON.parse(content1);
-  const parsed2 = JSON.parse(content2);
+  const parsed1 = parse(content1);
+  const parsed2 = parse(content2);
   const diff = makeDiff(parsed1, parsed2);
 
   return getFormattedDiff(diff);
