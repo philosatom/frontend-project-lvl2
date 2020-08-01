@@ -53,13 +53,16 @@ const getFormattedDiff = (diff) => {
 };
 
 export default (path1, path2) => {
-  const format = path.extname(path1);
-  const parse = parsersByFormat[format];
-
+  const format1 = path.extname(path1);
+  const parse1 = parsersByFormat[format1];
   const content1 = getFileContent(path1);
+  const parsed1 = parse1(content1);
+
+  const format2 = path.extname(path2);
+  const parse2 = parsersByFormat[format2];
   const content2 = getFileContent(path2);
-  const parsed1 = parse(content1);
-  const parsed2 = parse(content2);
+  const parsed2 = parse2(content2);
+
   const diff = makeDiff(parsed1, parsed2);
 
   return getFormattedDiff(diff);
