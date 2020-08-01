@@ -8,8 +8,8 @@ program
   .version(packageConfig.version, '-V, --version', 'output the version number')
   .description(packageConfig.description)
   .helpOption('-h, --help', 'output usage information')
-  .option('-f, --format [type]', 'output format')
+  .option('-f, --format [type]', 'output format', 'stylish')
   .arguments('<filepath1> <filepath2>')
-  .action((filepath1, filepath2) => console.log(genDiff(filepath1, filepath2)));
+  .action((filepath1, filepath2) => console.log(genDiff(filepath1, filepath2, program.format)));
 
 program.parse(process.argv);

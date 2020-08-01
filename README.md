@@ -12,10 +12,11 @@ $ make install
 ```
 
 ## Examples
+### `gendiff` works with nested structures:
+[![asciicast](https://asciinema.org/a/351071.svg)](https://asciinema.org/a/351071)
 ### `gendiff` works with .json/.yml/.ini files:
 [![asciicast](https://asciinema.org/a/350843.svg)](https://asciinema.org/a/350843)
 ### `gendiff` works with .json and .yml files:
 [![asciicast](https://asciinema.org/a/350817.svg)](https://asciinema.org/a/350817)
 ### `gendiff` works with .json files:
 [![asciicast](https://asciinema.org/a/350585.svg)](https://asciinema.org/a/350585)
-
