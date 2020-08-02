@@ -12,6 +12,8 @@ $ make install
 ```
 
 ## Examples
+### `gendiff` works with stylish/plain output formatters:
+[![asciicast](https://asciinema.org/a/351194.svg)](https://asciinema.org/a/351194)
 ### `gendiff` works with nested structures:
 [![asciicast](https://asciinema.org/a/351071.svg)](https://asciinema.org/a/351071)
 ### `gendiff` works with .json/.yml/.ini files:
