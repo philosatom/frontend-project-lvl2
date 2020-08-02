@@ -1,29 +1,34 @@
 import _ from 'lodash';
 
-const buildTree = (data) => {
-  const entries = Object.entries(data);
+const buildTree = (obj) => {
+  const entries = Object.entries(obj);
 
   const nodes = entries.map(([key, value]) => {
     if (!_.isPlainObject(value)) {
-      return { key, status: 'default', value };
+      return { key, value };
     }
 
-    return { key, status: 'default', children: buildTree(value) };
+    return { key, children: buildTree(value) };
   });
 
   return _.sortBy(nodes, ['key']);
 };
 
-const prefixes = {
-  removed: '-',
-  new: '+',
-  default: ' '
+const getPrefix = (status) => {
+  switch (status) {
+    case 'removed':
+      return '-';
+    case 'new':
+      return '+';
+    default:
+      return ' ';
+  }
 };
 
-const getFormattedDiff = (diff, depth = 0) => {
+const getFormattedDiff = (diffTree, depth = 0) => {
   const indent = ' '.repeat(4 * depth);
 
-  const formattedNodes = diff
+  const formattedNodes = diffTree
     .flatMap((node) => {
       if (node.status === 'modified') {
         const { key, oldValue, newValue } = node;
@@ -44,7 +49,7 @@ const getFormattedDiff = (diff, depth = 0) => {
       return node;
     })
     .map((node) => {
-      const prefix = prefixes[node.status];
+      const prefix = getPrefix(node.status);
       const newValue = _.has(node, 'children')
         ? getFormattedDiff(node.children, depth + 1)
         : node.value;
