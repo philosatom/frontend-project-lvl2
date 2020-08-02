@@ -1,6 +1,6 @@
+import _ from 'lodash';
 import yaml from 'js-yaml';
 import ini from 'ini';
-import _ from 'lodash';
 
 const parsers = {
   '.json': JSON.parse,

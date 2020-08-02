@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-const buildDiffTree = (data1, data2 = data1) => {
+const buildDiffTree = (data1, data2) => {
   const keys = _.union(Object.keys(data1), Object.keys(data2));
 
   const nodes = keys.flatMap((key) => {
@@ -16,11 +16,11 @@ const buildDiffTree = (data1, data2 = data1) => {
     }
 
     if (_.isPlainObject(value1) && _.isPlainObject(value2)) {
-      return { key, status: 'default', children: buildDiffTree(value1, value2) };
+      return { key, children: buildDiffTree(value1, value2) };
     }
 
     if (JSON.stringify(value1) === JSON.stringify(value2)) {
-      return { key, status: 'default', value: value1 };
+      return { key, status: 'unmodified', value: value1 };
     }
 
     return {
