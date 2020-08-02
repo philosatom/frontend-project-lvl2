@@ -23,10 +23,9 @@ const buildDiffTree = (data1, data2 = data1) => {
       return { key, status: 'default', value: value1 };
     }
 
-    return [
-      { key, status: 'removed', value: value1 },
-      { key, status: 'new', value: value2 }
-    ];
+    return {
+      key, status: 'modified', oldValue: value1, newValue: value2
+    };
   });
 
   return _.sortBy(nodes, ['key']);
