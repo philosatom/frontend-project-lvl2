@@ -24,10 +24,25 @@ const getFormattedDiff = (diff, depth = 0) => {
   const indent = ' '.repeat(4 * depth);
 
   const formattedNodes = diff
-    .map((node) => ((_.has(node, 'value') && _.isPlainObject(node.value))
-      ? { ...node, children: buildTree(node.value) }
-      : node
-    ))
+    .flatMap((node) => {
+      if (node.status === 'modified') {
+        const { key, oldValue, newValue } = node;
+        return [
+          { key, status: 'removed', value: oldValue },
+          { key, status: 'new', value: newValue }
+        ];
+      }
+
+      return node;
+    })
+    .map((node) => {
+      if (_.isPlainObject(node.value)) {
+        const { key, status, value } = node;
+        return { key, status, children: buildTree(value) };
+      }
+
+      return node;
+    })
     .map((node) => {
       const prefix = prefixes[node.status];
       const newValue = _.has(node, 'children')
@@ -35,10 +50,9 @@ const getFormattedDiff = (diff, depth = 0) => {
         : node.value;
 
       return `  ${prefix} ${node.key}: ${newValue}`;
-    })
-    .join(`\n${indent}`);
+    });
 
-  return ['{', formattedNodes, '}'].join(`\n${indent}`);
+  return ['{', ...formattedNodes, '}'].join(`\n${indent}`);
 };
 
 export default getFormattedDiff;
