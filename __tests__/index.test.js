@@ -37,3 +37,19 @@ describe.each(outputFormats)('gendiff %s', (outputFormat) => {
     expect(actual).toBe(expected);
   });
 });
+
+describe('throw errors', () => {
+  test('unknown input format', () => {
+    const path1 = pathsToActual.json.before;
+    const path2 = getFixturePath('expected.plain', 'txt');
+
+    expect(() => genDiff(path1, path2)).toThrow();
+  });
+
+  test('unknown output format', () => {
+    const path1 = pathsToActual.json.before;
+    const path2 = pathsToActual.yml.after;
+
+    expect(() => genDiff(path1, path2, 'unknown')).toThrow();
+  });
+});
