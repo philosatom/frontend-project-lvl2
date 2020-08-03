@@ -11,44 +11,41 @@ const getFixturePath = (filename, format) => (
 );
 
 const inputFormats = ['json', 'yml', 'ini'];
-const outputFormats = ['stylish', 'plain'];
+const outputFormats = ['stylish', 'plain', 'json'];
 
 const inputFormatsPairs = inputFormats.flatMap((format1) => (
   inputFormats.map((format2) => [format1, format2])
 ));
 
-const pathsToActual = inputFormats.reduce((acc, format) => {
-  const before = getFixturePath('before', format);
-  const after = getFixturePath('after', format);
+const expectedByFormat = outputFormats.reduce((acc, format) => {
+  const pathToExpected = getFixturePath(`expected-${format}`, 'txt');
+  const expected = fs.readFileSync(pathToExpected, 'utf-8');
 
-  return { ...acc, [format]: { before, after } };
+  return { ...acc, [format]: expected };
 }, {});
 
 describe.each(outputFormats)('gendiff %s', (outputFormat) => {
-  const pathToExpected = getFixturePath(`expected.${outputFormat}`, 'txt');
-  const expected = fs.readFileSync(pathToExpected, 'utf-8');
-
   test.each(inputFormatsPairs)('%s - %s', (inputFormat1, inputFormat2) => {
-    const path1 = pathsToActual[inputFormat1].before;
-    const path2 = pathsToActual[inputFormat2].after;
+    const path1 = getFixturePath('before', inputFormat1);
+    const path2 = getFixturePath('after', inputFormat2);
 
     const actual = genDiff(path1, path2, outputFormat);
 
-    expect(actual).toBe(expected);
+    expect(actual).toBe(expectedByFormat[outputFormat]);
   });
 });
 
 describe('throw errors', () => {
   test('unknown input format', () => {
-    const path1 = pathsToActual.json.before;
-    const path2 = getFixturePath('expected.plain', 'txt');
+    const path1 = getFixturePath('before', 'json');
+    const path2 = getFixturePath('expected-stylish', 'txt');
 
     expect(() => genDiff(path1, path2)).toThrow();
   });
 
   test('unknown output format', () => {
-    const path1 = pathsToActual.json.before;
-    const path2 = pathsToActual.yml.after;
+    const path1 = getFixturePath('before', 'json');
+    const path2 = getFixturePath('after', 'yml');
 
     expect(() => genDiff(path1, path2, 'unknown')).toThrow();
   });
