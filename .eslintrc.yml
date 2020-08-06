@@ -16,18 +16,6 @@ parserOptions:
 rules:
   no-console: 0
   import/extensions: 0
-  comma-dangle:
-    - error
-    - never
-  max-len:
-    - error
-    -
-      code: 100
-      ignoreComments: true
-      ignoreTrailingComments: true
-      ignoreStrings: true
-      ignoreTemplateLiterals: true
-      ignoreRegExpLiterals: true
   no-underscore-dangle:
     - error
     -
