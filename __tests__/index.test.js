@@ -17,21 +17,17 @@ const inputFormatsPairs = inputFormats.flatMap((format1) => (
   inputFormats.map((format2) => [format1, format2])
 ));
 
-const expectedByFormat = outputFormats.reduce((acc, format) => {
-  const pathToExpected = getFixturePath(`expected-${format}`, 'txt');
+describe.each(outputFormats)('gendiff %s', (outputFormat) => {
+  const pathToExpected = getFixturePath(`expected-${outputFormat}`, 'txt');
   const expected = fs.readFileSync(pathToExpected, 'utf-8');
 
-  return { ...acc, [format]: expected };
-}, {});
-
-describe.each(outputFormats)('gendiff %s', (outputFormat) => {
   test.each(inputFormatsPairs)('%s - %s', (inputFormat1, inputFormat2) => {
     const path1 = getFixturePath('before', inputFormat1);
     const path2 = getFixturePath('after', inputFormat2);
 
     const actual = genDiff(path1, path2, outputFormat);
 
-    expect(actual).toBe(expectedByFormat[outputFormat]);
+    expect(actual).toBe(expected);
   });
 });
 
