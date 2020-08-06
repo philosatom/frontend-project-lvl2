@@ -1,55 +1,48 @@
 import _ from 'lodash';
 
-const buildTree = (obj) => {
-  const entries = Object.entries(obj);
+const stringify = (data, indent) => {
+  if (!_.isPlainObject(data)) return data;
 
-  const nodes = entries.map(([key, value]) => (
-    _.isPlainObject(value) ? { key, children: buildTree(value) } : { key, value }
-  ));
+  const delimiter = `\n${indent}`;
+  const keys = Object.keys(data).sort();
+  const lines = keys.map((key) => {
+    const value = data[key];
+    const newIndent = `${indent}    `;
+    const newValue = stringify(value, newIndent);
 
-  return _.sortBy(nodes, ['key']);
+    return `    ${key}: ${newValue}`;
+  });
+
+  return ['{', ...lines, '}'].join(delimiter);
 };
 
-const getPrefix = (type) => {
-  switch (type) {
-    case 'removed':
-      return '-';
-    case 'added':
-      return '+';
-    default:
-      return ' ';
-  }
+const lineBuilders = {
+  removed: ({ key, value }, outerIndent) => `  - ${key}: ${stringify(value, outerIndent)}`,
+  added: ({ key, value }, outerIndent) => `  + ${key}: ${stringify(value, outerIndent)}`,
+  modified: ({ key, oldValue, newValue }, outerIndent) => [
+    `  - ${key}: ${stringify(oldValue, outerIndent)}`,
+    `  + ${key}: ${stringify(newValue, outerIndent)}`,
+  ],
+  unmodified: ({ key, value }, outerIndent) => `    ${key}: ${stringify(value, outerIndent)}`,
 };
 
-const getFormattedDiff = (diffTree, depth = 0) => {
-  const indent = ' '.repeat(4 * depth);
+export default (diffTree) => {
+  const iter = (nodes, depth) => {
+    const indent = ' '.repeat(4 * depth);
+    const delimiter = `\n${indent}`;
+    const lines = nodes.flatMap((node) => {
+      if (node.type !== 'nested') {
+        const buildLine = lineBuilders[node.type];
+        const newIndent = `${indent}    `;
 
-  const formattedNodes = diffTree
-    .flatMap((node) => {
-      if (node.type !== 'modified') return node;
+        return buildLine(node, newIndent);
+      }
 
-      const { key, oldValue, newValue } = node;
-      return [
-        { key, type: 'removed', value: oldValue },
-        { key, type: 'added', value: newValue },
-      ];
-    })
-    .map((node) => {
-      if (!_.isPlainObject(node.value)) return node;
-
-      const { key, type, value } = node;
-      return { key, type, children: buildTree(value) };
-    })
-    .map((node) => {
-      const prefix = getPrefix(node.type);
-      const newValue = _.has(node, 'children')
-        ? getFormattedDiff(node.children, depth + 1)
-        : node.value;
-
-      return `  ${prefix} ${node.key}: ${newValue}`;
+      return `    ${node.key}: ${iter(node.children, depth + 1)}`;
     });
 
-  return ['{', ...formattedNodes, '}'].join(`\n${indent}`);
-};
+    return ['{', ...lines, '}'].join(delimiter);
+  };
 
-export default getFormattedDiff;
+  return iter(diffTree, 0);
+};
