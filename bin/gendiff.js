@@ -2,7 +2,7 @@
 
 import program from 'commander';
 import getConfigPropertyValue from '../src/package-config.js';
-import genDiff from '../src/gendiff.js';
+import genDiff from '../index.js';
 
 program
   .version(getConfigPropertyValue('version'), '-V, --version', 'output the version number')
