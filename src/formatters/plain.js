@@ -14,7 +14,7 @@ const lineBuilders = {
   ),
   modified: (path, { oldValue, newValue }) => (
     `Property '${path}' was updated from ${stringify(oldValue)} to ${stringify(newValue)}`
-  )
+  ),
 };
 
 export default (diffTree) => {
@@ -24,7 +24,7 @@ export default (diffTree) => {
       const newAncestors = [...ancestors, node.key];
       const pathToCurrent = newAncestors.join('.');
 
-      if (!_.has(node, 'children')) {
+      if (node.type !== 'nested') {
         const buildLine = lineBuilders[node.type];
         return buildLine(pathToCurrent, node);
       }
