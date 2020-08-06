@@ -14,6 +14,6 @@ test-coverage:
 	npm test -- --coverage --coverageProvider=v8
 
 gendiff:
-	node --experimental-json-modules --no-warnings bin/gendiff.js
+	node bin/gendiff.js
 
 .PHONY: test
