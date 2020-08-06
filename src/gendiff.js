@@ -1,6 +1,7 @@
 import path from 'path';
 import process from 'process';
 import fs from 'fs';
+import _ from 'lodash';
 import getParser from './parsers.js';
 import buildDiffTree from './buildDiffTree.js';
 import getFormatter from './formatters/index.js';
@@ -10,16 +11,24 @@ const getFileContent = (filepath) => {
   return fs.readFileSync(fullpath, 'utf-8');
 };
 
-export default (path1, path2, outputFormat) => {
-  const extension1 = path.extname(path1);
-  const parse1 = getParser(extension1);
-  const content1 = getFileContent(path1);
-  const parsed1 = parse1(content1);
+const getDataFormat = (filepath) => {
+  const extension = path.extname(filepath);
+  return _.trimStart(extension, '.');
+};
 
-  const extension2 = path.extname(path2);
-  const parse2 = getParser(extension2);
-  const content2 = getFileContent(path2);
-  const parsed2 = parse2(content2);
+const getParsed = (data, format) => {
+  const parse = getParser(format);
+  return parse(data);
+};
+
+export default (filepath1, filepath2, outputFormat) => {
+  const content1 = getFileContent(filepath1);
+  const dataFormat1 = getDataFormat(filepath1);
+  const parsed1 = getParsed(content1, dataFormat1);
+
+  const content2 = getFileContent(filepath2);
+  const dataFormat2 = getDataFormat(filepath2);
+  const parsed2 = getParsed(content2, dataFormat2);
 
   const diffTree = buildDiffTree(parsed1, parsed2);
   const getFormattedDiff = getFormatter(outputFormat);
