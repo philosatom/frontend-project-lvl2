@@ -9,7 +9,7 @@ const stringify = (value) => {
 
 const lineBuilders = {
   removed: (path) => `Property '${path}' was removed`,
-  new: (path, { value }) => (
+  added: (path, { value }) => (
     `Property '${path}' was added with value: ${stringify(value)}`
   ),
   modified: (path, { oldValue, newValue }) => (
@@ -19,13 +19,13 @@ const lineBuilders = {
 
 export default (diffTree) => {
   const iter = (nodes, ancestors) => nodes
-    .filter(({ status }) => status !== 'unmodified')
+    .filter(({ type }) => type !== 'unmodified')
     .map((node) => {
       const newAncestors = [...ancestors, node.key];
       const pathToCurrent = newAncestors.join('.');
 
       if (!_.has(node, 'children')) {
-        const buildLine = lineBuilders[node.status];
+        const buildLine = lineBuilders[node.type];
         return buildLine(pathToCurrent, node);
       }
 

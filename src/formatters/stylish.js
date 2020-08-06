@@ -3,22 +3,18 @@ import _ from 'lodash';
 const buildTree = (obj) => {
   const entries = Object.entries(obj);
 
-  const nodes = entries.map(([key, value]) => {
-    if (!_.isPlainObject(value)) {
-      return { key, value };
-    }
-
-    return { key, children: buildTree(value) };
-  });
+  const nodes = entries.map(([key, value]) => (
+    _.isPlainObject(value) ? { key, children: buildTree(value) } : { key, value }
+  ));
 
   return _.sortBy(nodes, ['key']);
 };
 
-const getPrefix = (status) => {
-  switch (status) {
+const getPrefix = (type) => {
+  switch (type) {
     case 'removed':
       return '-';
-    case 'new':
+    case 'added':
       return '+';
     default:
       return ' ';
@@ -30,26 +26,22 @@ const getFormattedDiff = (diffTree, depth = 0) => {
 
   const formattedNodes = diffTree
     .flatMap((node) => {
-      if (node.status === 'modified') {
-        const { key, oldValue, newValue } = node;
-        return [
-          { key, status: 'removed', value: oldValue },
-          { key, status: 'new', value: newValue }
-        ];
-      }
+      if (node.type !== 'modified') return node;
 
-      return node;
+      const { key, oldValue, newValue } = node;
+      return [
+        { key, type: 'removed', value: oldValue },
+        { key, type: 'added', value: newValue },
+      ];
     })
     .map((node) => {
-      if (_.isPlainObject(node.value)) {
-        const { key, status, value } = node;
-        return { key, status, children: buildTree(value) };
-      }
+      if (!_.isPlainObject(node.value)) return node;
 
-      return node;
+      const { key, type, value } = node;
+      return { key, type, children: buildTree(value) };
     })
     .map((node) => {
-      const prefix = getPrefix(node.status);
+      const prefix = getPrefix(node.type);
       const newValue = _.has(node, 'children')
         ? getFormattedDiff(node.children, depth + 1)
         : node.value;
