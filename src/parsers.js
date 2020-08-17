@@ -8,10 +8,11 @@ const parsers = {
   ini: ini.parse,
 };
 
-export default (dataFormat) => {
+export default (data, dataFormat) => {
   if (!_.has(parsers, dataFormat)) {
-    throw new Error(`There is no parser for '${dataFormat}' format.`);
+    throw new Error(`Unknown data format: '${dataFormat}'.`);
   }
 
-  return parsers[dataFormat];
+  const parse = parsers[dataFormat];
+  return parse(data);
 };

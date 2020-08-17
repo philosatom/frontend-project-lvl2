@@ -5,10 +5,11 @@ import json from './json.js';
 
 const formatters = { stylish, plain, json };
 
-export default (outputFormat) => {
+export default (diffTree, outputFormat) => {
   if (!_.has(formatters, outputFormat)) {
-    throw new Error(`There is no '${outputFormat}' formatter.`);
+    throw new Error(`Unknown output format: '${outputFormat}'.`);
   }
 
-  return formatters[outputFormat];
+  const format = formatters[outputFormat];
+  return format(diffTree);
 };
