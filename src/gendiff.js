@@ -1,10 +1,9 @@
 import path from 'path';
 import process from 'process';
 import fs from 'fs';
-import _ from 'lodash';
-import getParser from './parsers.js';
+import getParsed from './parsers.js';
 import buildDiffTree from './buildDiffTree.js';
-import getFormatter from './formatters/index.js';
+import getFormattedDiff from './formatters/index.js';
 
 const getFileContent = (filepath) => {
   const fullpath = path.resolve(process.cwd(), filepath);
@@ -13,12 +12,7 @@ const getFileContent = (filepath) => {
 
 const getDataFormat = (filepath) => {
   const extension = path.extname(filepath);
-  return _.trimStart(extension, '.');
-};
-
-const getParsed = (data, format) => {
-  const parse = getParser(format);
-  return parse(data);
+  return extension.slice(1);
 };
 
 export default (filepath1, filepath2, outputFormat) => {
@@ -31,7 +25,5 @@ export default (filepath1, filepath2, outputFormat) => {
   const parsed2 = getParsed(content2, dataFormat2);
 
   const diffTree = buildDiffTree(parsed1, parsed2);
-  const getFormattedDiff = getFormatter(outputFormat);
-
-  return getFormattedDiff(diffTree);
+  return getFormattedDiff(diffTree, outputFormat);
 };
