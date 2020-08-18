@@ -17,13 +17,14 @@ const stringify = (data, indent) => {
 };
 
 const lineBuilders = {
-  removed: ({ key, value }, outerIndent) => `  - ${key}: ${stringify(value, outerIndent)}`,
-  added: ({ key, value }, outerIndent) => `  + ${key}: ${stringify(value, outerIndent)}`,
-  modified: ({ key, oldValue, newValue }, outerIndent) => [
-    `  - ${key}: ${stringify(oldValue, outerIndent)}`,
-    `  + ${key}: ${stringify(newValue, outerIndent)}`,
+  removed: ({ key, value }, { indent }) => `  - ${key}: ${stringify(value, indent)}`,
+  added: ({ key, value }, { indent }) => `  + ${key}: ${stringify(value, indent)}`,
+  modified: ({ key, oldValue, newValue }, { indent }) => [
+    `  - ${key}: ${stringify(oldValue, indent)}`,
+    `  + ${key}: ${stringify(newValue, indent)}`,
   ],
-  unmodified: ({ key, value }, outerIndent) => `    ${key}: ${stringify(value, outerIndent)}`,
+  unmodified: ({ key, value }, { indent }) => `    ${key}: ${stringify(value, indent)}`,
+  nested: ({ key, children }, { iteratee, depth }) => `    ${key}: ${iteratee(children, depth)}`,
 };
 
 export default (diffTree) => {
@@ -31,14 +32,14 @@ export default (diffTree) => {
     const indent = ' '.repeat(4 * depth);
     const delimiter = `\n${indent}`;
     const lines = nodes.flatMap((node) => {
-      if (node.type !== 'nested') {
-        const buildLine = lineBuilders[node.type];
-        const newIndent = `${indent}    `;
+      const buildLine = lineBuilders[node.type];
+      const options = {
+        indent: `${indent}    `,
+        depth: depth + 1,
+        iteratee: iter,
+      };
 
-        return buildLine(node, newIndent);
-      }
-
-      return `    ${node.key}: ${iter(node.children, depth + 1)}`;
+      return buildLine(node, options);
     });
 
     return ['{', ...lines, '}'].join(delimiter);
