@@ -1,14 +1,19 @@
 import _ from 'lodash';
 
-const stringify = (data, indent) => {
+const indentSize = 4;
+const getDelimiter = (depth) => {
+  const indent = ' '.repeat(indentSize * depth);
+  return `\n${indent}`;
+};
+
+const stringify = (data, depth) => {
   if (!_.isPlainObject(data)) return data;
 
-  const delimiter = `\n${indent}`;
+  const delimiter = getDelimiter(depth);
   const keys = Object.keys(data).sort();
   const lines = keys.map((key) => {
     const value = data[key];
-    const newIndent = `${indent}    `;
-    const newValue = stringify(value, newIndent);
+    const newValue = stringify(value, depth + 1);
 
     return `    ${key}: ${newValue}`;
   });
@@ -17,30 +22,25 @@ const stringify = (data, indent) => {
 };
 
 const lineBuilders = {
-  removed: ({ key, value }, { indent }) => `  - ${key}: ${stringify(value, indent)}`,
-  added: ({ key, value }, { indent }) => `  + ${key}: ${stringify(value, indent)}`,
-  modified: ({ key, oldValue, newValue }, { indent }) => [
-    `  - ${key}: ${stringify(oldValue, indent)}`,
-    `  + ${key}: ${stringify(newValue, indent)}`,
+  removed: ({ key, value }, { depth }) => `  - ${key}: ${stringify(value, depth)}`,
+  added: ({ key, value }, { depth }) => `  + ${key}: ${stringify(value, depth)}`,
+  modified: ({ key, oldValue, newValue }, { depth }) => [
+    `  - ${key}: ${stringify(oldValue, depth)}`,
+    `  + ${key}: ${stringify(newValue, depth)}`,
   ],
-  unmodified: ({ key, value }, { indent }) => `    ${key}: ${stringify(value, indent)}`,
+  unmodified: ({ key, value }, { depth }) => `    ${key}: ${stringify(value, depth)}`,
   nested: ({ key, children }, { iteratee, depth }) => `    ${key}: ${iteratee(children, depth)}`,
+};
+
+const getLine = (node, options) => {
+  const buildLine = lineBuilders[node.type];
+  return buildLine(node, options);
 };
 
 export default (diffTree) => {
   const iter = (nodes, depth) => {
-    const indent = ' '.repeat(4 * depth);
-    const delimiter = `\n${indent}`;
-    const lines = nodes.flatMap((node) => {
-      const buildLine = lineBuilders[node.type];
-      const options = {
-        indent: `${indent}    `,
-        depth: depth + 1,
-        iteratee: iter,
-      };
-
-      return buildLine(node, options);
-    });
+    const delimiter = getDelimiter(depth);
+    const lines = nodes.flatMap((node) => getLine(node, { depth: depth + 1, iteratee: iter }));
 
     return ['{', ...lines, '}'].join(delimiter);
   };

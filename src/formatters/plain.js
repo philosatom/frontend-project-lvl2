@@ -18,15 +18,15 @@ const lineBuilders = {
   nested: (ancestors, { children }, iteratee) => iteratee(children, ancestors),
 };
 
+const getLine = (node, { ancestors, iteratee }) => {
+  const buildLine = lineBuilders[node.type];
+  return buildLine(ancestors, node, iteratee);
+};
+
 export default (diffTree) => {
   const iter = (nodes, ancestors) => nodes
     .filter(({ type }) => type !== 'unmodified')
-    .map((node) => {
-      const buildLine = lineBuilders[node.type];
-      const newAncestors = [...ancestors, node.key];
-
-      return buildLine(newAncestors, node, iter);
-    })
+    .map((node) => getLine(node, { ancestors: [...ancestors, node.key], iteratee: iter }))
     .join('\n');
 
   return iter(diffTree, []);
