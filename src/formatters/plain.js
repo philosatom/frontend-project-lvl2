@@ -7,13 +7,15 @@ const stringify = (value) => {
   return value;
 };
 
+const getPathToProperty = (ancestors) => ancestors.join('.');
+
 const lineBuilders = {
-  removed: (ancestors) => `Property '${ancestors.join('.')}' was removed`,
+  removed: (ancestors) => `Property '${getPathToProperty(ancestors)}' was removed`,
   added: (ancestors, { value }) => (
-    `Property '${ancestors.join('.')}' was added with value: ${stringify(value)}`
+    `Property '${getPathToProperty(ancestors)}' was added with value: ${stringify(value)}`
   ),
   modified: (ancestors, { oldValue, newValue }) => (
-    `Property '${ancestors.join('.')}' was updated from ${stringify(oldValue)} to ${stringify(newValue)}`
+    `Property '${getPathToProperty(ancestors)}' was updated from ${stringify(oldValue)} to ${stringify(newValue)}`
   ),
   nested: (ancestors, { children }, iteratee) => iteratee(children, ancestors),
 };

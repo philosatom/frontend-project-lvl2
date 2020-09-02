@@ -1,11 +1,9 @@
 import _ from 'lodash';
 
 const buildDiffTree = (data1, data2) => {
-  const keys1 = Object.keys(data1);
-  const keys2 = Object.keys(data2);
-  const allKeys = _.union(keys1, keys2).sort();
+  const keys = _.union(_.keys(data1), _.keys(data2)).sort();
 
-  return allKeys.map((key) => {
+  return keys.map((key) => {
     const value1 = data1[key];
     const value2 = data2[key];
 
@@ -21,7 +19,7 @@ const buildDiffTree = (data1, data2) => {
       return { key, type: 'nested', children: buildDiffTree(value1, value2) };
     }
 
-    if (JSON.stringify(value1) === JSON.stringify(value2)) {
+    if (_.isEqual(value1, value2)) {
       return { key, type: 'unmodified', value: value1 };
     }
 

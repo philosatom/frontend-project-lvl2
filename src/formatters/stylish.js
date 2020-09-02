@@ -10,7 +10,7 @@ const stringify = (data, depth) => {
   if (!_.isPlainObject(data)) return data;
 
   const delimiter = getDelimiter(depth);
-  const keys = Object.keys(data).sort();
+  const keys = _.keys(data).sort();
   const lines = keys.map((key) => {
     const value = data[key];
     const newValue = stringify(value, depth + 1);
